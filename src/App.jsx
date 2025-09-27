@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ShieldCheck,
   FileText,
@@ -27,27 +27,42 @@ const LandingPage = () => {
     contato: "",
     caso: "",
   });
+  const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setErrors({ ...errors, [e.target.name]: "" });
+    setSuccess(false);
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.nome.trim()) newErrors.nome = "Nome é obrigatório.";
+    if (!formData.contato.trim()) newErrors.contato = "Contato é obrigatório.";
+    if (!formData.caso.trim()) newErrors.caso = "Descreva seu caso.";
+    return newErrors;
   };
 
   const handleSubmit = (e) => {
+    e && e.preventDefault && e.preventDefault();
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setSuccess(false);
+      return;
+    }
+    setErrors({});
+    setSuccess(true);
     const numeroEmpresa = "5573999099040"; // coloque o número da empresa aqui
-
-    const mensagem = `Olá, gostaria de solicitar uma análise:
-  
-- Nome: ${formData.nome}
-- Contato: ${formData.contato}
-- Caso: ${formData.caso}`;
-
+    const mensagem = `Olá, gostaria de solicitar uma análise:\n  \n- Nome: ${formData.nome}\n- Contato: ${formData.contato}\n- Caso: ${formData.caso}`;
     const url = `https://wa.me/${numeroEmpresa}?text=${encodeURIComponent(
       mensagem
     )}`;
-
     window.open(url, "_blank"); // abre o WhatsApp em uma nova aba/janela
   };
 
@@ -105,6 +120,41 @@ const LandingPage = () => {
     },
   ];
 
+  const faqs = [
+    {
+      question: "O que é o BPC/LOAS? É uma aposentadoria?",
+      answer:
+        "Não, o Benefício de Prestação Continuada (BPC/LOAS) não é uma aposentadoria. É um benefício assistencial de um salário mínimo mensal pago a idosos com 65 anos ou mais, ou a pessoas com deficiência de qualquer idade, desde que comprovem baixa renda familiar. Ele não exige contribuição prévia ao INSS, mas também não dá direito a 13º salário ou pensão por morte.",
+    },
+    {
+      question:
+        "Crianças com autismo ou outras neurodivergências têm direito a benefícios?",
+      answer:
+        "Sim, é possível solicitar o BPC/LOAS para crianças com autismo ou outras deficiências que gerem impedimentos de longo prazo. A concessão depende de avaliação médica e social do INSS, que analisa a condição da criança e a renda familiar, que deve ser de no máximo 1/4 do salário mínimo por pessoa.",
+    },
+    {
+      question:
+        "Recebi um auxílio-doença, posso ter direito ao auxílio-acidente?",
+      answer:
+        "Sim, o Auxílio-Acidente é um benefício indenizatório pago a quem sofreu um acidente (de trabalho ou não) e ficou com sequelas que reduzem sua capacidade de trabalho de forma permanente. Ele é pago geralmente após a alta do auxílio-doença e pode ser acumulado com o salário, sendo cessado apenas com a aposentadoria do segurado.",
+    },
+    {
+      question: "O que devo levar para a perícia médica do INSS?",
+      answer:
+        "No dia da perícia, leve todos os documentos que comprovem sua incapacidade, como atestados, laudos, receitas e exames médicos recentes e em bom estado. É fundamental ser honesto sobre sua condição e como ela afeta sua rotina e a capacidade para o trabalho. Não minta ou exagere, pois o perito pode verificar a autenticidade das informações.",
+    },
+    {
+      question: "Quanto tempo de contribuição eu preciso para me aposentar?",
+      answer:
+        "Depende da regra de aposentadoria aplicável ao seu caso. Após a Reforma da Previdência, as regras mudaram e, além do tempo de contribuição, é necessário cumprir uma idade mínima (65 anos para homens e 62 para mulheres) e um tempo de contribuição de 15 anos para mulheres e 20 anos para homens que começaram a contribuir após a reforma.",
+    },
+    {
+      question: "O que é o CNIS e como consulto meu extrato?",
+      answer:
+        "O CNIS (Cadastro Nacional de Informações Sociais) é o extrato com todo o seu histórico de contribuições. Você pode consultá-lo facilmente pelo site ou aplicativo Meu INSS, usando seu CPF e senha.",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -134,8 +184,7 @@ const LandingPage = () => {
               <p className="text-lg lg:text-xl xl:text-2xl mb-8 text-gray-200 leading-relaxed">
                 Advocacia especializada em{" "}
                 <strong>Direito Previdenciário</strong> com foco em processos
-                administrativos e judiciais no INSS. Mais de 500 casos de
-                sucesso.
+                administrativos e judiciais no INSS.
               </p>
 
               <div className="flex flex-wrap gap-3 mb-8">
@@ -180,7 +229,7 @@ const LandingPage = () => {
                 <Scale className="h-6 w-6 text-amber-400" />
                 Receba uma análise pré-liminar
               </h3>
-              <div className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-white mb-2 font-medium">
                     Nome Completo
@@ -191,8 +240,13 @@ const LandingPage = () => {
                     value={formData.nome}
                     onChange={handleInputChange}
                     placeholder="Digite seu nome completo"
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
+                    className={`w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 ${
+                      errors.nome ? "border-red-500" : ""
+                    }`}
                   />
+                  {errors.nome && (
+                    <span className="text-red-300 text-xs">{errors.nome}</span>
+                  )}
                 </div>
                 <div>
                   <label className="block text-white mb-2 font-medium">
@@ -204,8 +258,15 @@ const LandingPage = () => {
                     value={formData.contato}
                     onChange={handleInputChange}
                     placeholder="(00) 00000-0000 ou email@exemplo.com"
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
+                    className={`w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 ${
+                      errors.contato ? "border-red-500" : ""
+                    }`}
                   />
+                  {errors.contato && (
+                    <span className="text-red-300 text-xs">
+                      {errors.contato}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="block text-white mb-2 font-medium">
@@ -217,19 +278,29 @@ const LandingPage = () => {
                     value={formData.caso}
                     onChange={handleInputChange}
                     placeholder="Ex: Meu benefício foi negado pelo INSS, preciso de ajuda para entrar com recurso..."
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none transition-all duration-300"
+                    className={`w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none transition-all duration-300 ${
+                      errors.caso ? "border-red-500" : ""
+                    }`}
                   />
+                  {errors.caso && (
+                    <span className="text-red-300 text-xs">{errors.caso}</span>
+                  )}
                 </div>
                 <button
-                  onClick={handleSubmit}
+                  type="submit"
                   className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-[1.02] shadow-xl"
                 >
                   Envio para Whatsapp
                 </button>
+                {success && (
+                  <p className="text-green-300 text-center text-sm">
+                    Enviado com sucesso! Aguarde nosso contato.
+                  </p>
+                )}
                 <p className="text-xs text-gray-300 text-center">
                   Resposta em até 24 horas • 100% confidencial
                 </p>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -288,25 +359,56 @@ const LandingPage = () => {
 
                   <div className="bg-amber-50 border-l-4 border-amber-500 p-4 my-6">
                     <p className="text-amber-800 italic">
-                      "Minha missão é garantir que cada pessoa tenha acesso aos
-                      benefícios que tem direito, com transparência, dedicação e
-                      resultado."
+                      "Sinto-me realizada na minha profissão, ao conseguir vê
+                      garantidos todos os direitos do meu cliente. Ao prezar
+                      pela celeridade, montamos e descutimos a estratégia melhor
+                      para cada caso."
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-8">
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-amber-600">
-                      500+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+                  {/* Card Ação Judicial */}
+                  <div className="bg-white border-2 border-amber-400 p-6 rounded-xl text-center shadow-lg hover:shadow-amber-200 transition-shadow duration-300 flex flex-col items-center">
+                    <Scale className="mx-auto h-10 w-10 text-amber-500 mb-2" />
+                    <div className="text-2xl font-bold text-amber-600 mb-1">
+                      Ação Judicial
                     </div>
-                    <div className="text-sm text-gray-600">
-                      Casos Resolvidos
+                    <div className="text-gray-700 mb-2">
+                      Quando seus direitos são negados, lutamos por você na
+                      Justiça!
                     </div>
+                    <button
+                      className="mt-2 px-4 py-2 bg-amber-500 text-white rounded-full font-semibold hover:bg-amber-600 transition"
+                      onClick={() =>
+                        document
+                          .getElementById("contato")
+                          ?.scrollIntoView({ behavior: "smooth" })
+                      }
+                    >
+                      Saiba mais
+                    </button>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-green-600">95%</div>
-                    <div className="text-sm text-gray-600">Taxa de Sucesso</div>
+                  {/* Card Ação Administrativa */}
+                  <div className="bg-white border-2 border-green-400 p-6 rounded-xl text-center shadow-lg hover:shadow-green-200 transition-shadow duration-300 flex flex-col items-center">
+                    <FileCheck className="mx-auto h-10 w-10 text-green-500 mb-2" />
+                    <div className="text-2xl font-bold text-green-600 mb-1">
+                      Ação Administrativa
+                    </div>
+                    <div className="text-gray-700 mb-2">
+                      Orientação completa para resolver seu caso direto no INSS,
+                      sem complicações.
+                    </div>
+                    <button
+                      className="mt-2 px-4 py-2 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 transition"
+                      onClick={() =>
+                        document
+                          .getElementById("contato")
+                          ?.scrollIntoView({ behavior: "smooth" })
+                      }
+                    >
+                      Saiba mais
+                    </button>
                   </div>
                 </div>
               </div>
@@ -340,44 +442,83 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Resultados que Falam por Si
+              Dúvidas Frequentes sobre Aposentadoria e INSS 🧐
             </h2>
             <p className="text-gray-600">
-              Números reais de uma advocacia comprometida com resultados
+              Veja a resposta das principais dúvidas ligadas ao INSS e
+              aposentadoria.
             </p>
+            <div className="block lg:hidden mt-2 text-amber-600 text-sm font-medium flex items-center justify-center gap-1">
+              <svg
+                className="w-4 h-4 inline-block animate-bounce"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+              Toque para ver a resposta
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl lg:text-5xl font-bold text-amber-600 mb-2">
-                500+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {faqs.map((faq, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                tabIndex={0}
+                role="button"
+                aria-expanded={openFaq === idx}
+                aria-controls={`faq-answer-${idx}`}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" || e.key === " ")
+                    setOpenFaq(openFaq === idx ? null : idx);
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    {faq.question}
+                  </h3>
+                  <svg
+                    className={`w-5 h-5 ml-2 transition-transform duration-200 ${
+                      openFaq === idx
+                        ? "rotate-180 text-amber-500"
+                        : "text-gray-400"
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+                {openFaq === idx && (
+                  <p
+                    id={`faq-answer-${idx}`}
+                    className="text-gray-600 mt-2 transition-all duration-300"
+                  >
+                    {faq.answer}
+                  </p>
+                )}
+                <div className="lg:hidden text-xs text-gray-400 mt-1">
+                  {!openFaq === idx && "Toque para ver a resposta"}
+                </div>
               </div>
-              <div className="text-gray-600 font-medium">Casos de Sucesso</div>
-            </div>
-            <div className="text-center bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl lg:text-5xl font-bold text-green-600 mb-2">
-                95%
-              </div>
-              <div className="text-gray-600 font-medium">Taxa de Aprovação</div>
-            </div>
-            <div className="text-center bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl lg:text-5xl font-bold text-blue-600 mb-2">
-                10+
-              </div>
-              <div className="text-gray-600 font-medium">
-                Anos de Experiência
-              </div>
-            </div>
-            <div className="text-center bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl lg:text-5xl font-bold text-purple-600 mb-2">
-                24h
-              </div>
-              <div className="text-gray-600 font-medium">Tempo de Resposta</div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-
       {/* Services Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -688,3 +829,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
