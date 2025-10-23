@@ -58,7 +58,7 @@ const LandingPage = () => {
     }
     setErrors({});
     setSuccess(true);
-    const numeroEmpresa = "5573999099040"; // coloque o número da empresa aqui
+    const numeroEmpresa = "5573988599019"; // coloque o número da empresa aqui
     const mensagem = `Olá, gostaria de solicitar uma análise:\n  \n- Nome: ${formData.nome}\n- Contato: ${formData.contato}\n- Caso: ${formData.caso}`;
     const url = `https://wa.me/${numeroEmpresa}?text=${encodeURIComponent(
       mensagem
@@ -325,7 +325,7 @@ const LandingPage = () => {
                     Dra. Mileide Cordeiro
                   </h3>
                   <p className="text-amber-600 font-semibold text-lg">
-                    OAB/XX 00000
+                    OAB/BA 59899
                   </p>
                   <p className="text-gray-600">
                     Advogada especialista em Direito Previdenciário
@@ -712,7 +712,7 @@ const LandingPage = () => {
                     <Phone className="h-6 w-6 text-amber-400" />
                     <div>
                       <div className="font-semibold">Telefone/WhatsApp</div>
-                      <div className="text-gray-300">(00) 00000-0000</div>
+                      <div className="text-gray-300">(73) 98859-9019</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -720,7 +720,7 @@ const LandingPage = () => {
                     <div>
                       <div className="font-semibold">Email</div>
                       <div className="text-gray-300">
-                        contato@advocaciaprevidenciaria.com
+                        mileideadvogada@gmail.com
                       </div>
                     </div>
                   </div>
@@ -729,9 +729,9 @@ const LandingPage = () => {
                     <div>
                       <div className="font-semibold">Endereço</div>
                       <div className="text-gray-300">
-                        Rua Example, 123 - Centro
+                        Edifício Comercial Fraga Center, 123 - Centro
                         <br />
-                        Sua Cidade - UF
+                        Ilhéus - BA
                       </div>
                     </div>
                   </div>
@@ -781,7 +781,7 @@ const LandingPage = () => {
                     <input
                       type="tel"
                       className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      placeholder="(00) 00000-0000"
+                      placeholder="(73) 98859-9019"
                     />
                   </div>
                   <div>
@@ -819,7 +819,7 @@ const LandingPage = () => {
             </div>
             <div className="text-sm text-gray-500">
               © 2024 Advocacia Previdenciária. Todos os direitos reservados. |
-              OAB/XX 00000
+              OAB/BA59899
             </div>
           </div>
         </div>
